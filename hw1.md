@@ -1,0 +1,168 @@
+---
+title: "Homework 1"
+author: 'Bryan Tong'
+date: "01-29-2020"
+output: 
+  html_document:
+    keep_md: yes
+---
+
+
+
+## Task 1
+
+
+```r
+is.armstrong <- function(x, na.rm = FALSE) {
+  
+  answer <- vector()
+
+  #Remove or replace NA values if necessary
+  if (na.rm == TRUE){
+    x <- na.omit(x)
+  } else {
+    x[is.na(x)] <- 10
+  }
+  
+  #Check if any of the values in x is negative
+  if (any(x < 0)){
+    stop("Cannot have negative numbers.")
+  }
+  
+  #Check if any of the values in x is not a numeric value
+  if (any(!is.numeric(x))){
+    stop("Cannot have non-numeric values.")
+  }
+  
+  #Check if any of the numbers in x is a decimal
+  if (any(x %% 1 != 0)){
+    stop("Cannot have decimal values.")
+  }
+  
+  #Check if any of the numbers have more than 3 digits
+  if (any(x > 999)){
+    stop("Cannot have numbers with more than 3 digits.")
+  }
+  
+  #Loop through each element in vector x
+  for (number in x){
+
+    #Because number is in base 10, to find number of digits keep dividing by 10 
+    temp = number
+    digits = 0
+    #As long as number is greater than 0, there are still more digits left so keep counting and dividing
+    while (temp > 0){
+      temp = temp / 10
+      temp = floor(temp)
+      digits = digits + 1
+    }
+  
+    #Calculate sum of each digit raised to the (digits) power 
+    newTemp = number
+    sum = 0
+    while (newTemp > 0){
+      lastDigit = newTemp %% 10
+      sum = sum + (lastDigit) ^ digits
+      newTemp = newTemp / 10
+      newTemp = floor(newTemp)
+    }
+    
+    answer <- c(answer, sum == number)
+  
+  }
+  
+  return (answer)
+
+}
+```
+
+
+## Task 2
+
+#### Valid inputs
+
+
+```r
+is.armstrong(x = 1)
+```
+
+```
+[1] TRUE
+```
+
+```r
+is.armstrong(x = 153)
+```
+
+```
+[1] TRUE
+```
+
+```r
+is.armstrong(x = 154)
+```
+
+```
+[1] FALSE
+```
+
+```r
+is.armstrong(x = c(153, 154, NA))
+```
+
+```
+[1]  TRUE FALSE FALSE
+```
+
+```r
+is.armstrong(x = c(1, 33, 999))
+```
+
+```
+[1]  TRUE FALSE FALSE
+```
+
+#### Invalid inputs
+
+
+```r
+is.armstrong(x = -2)
+```
+
+```
+Error in is.armstrong(x = -2): Cannot have negative numbers.
+```
+
+```r
+is.armstrong(x = 1011)
+```
+
+```
+Error in is.armstrong(x = 1011): Cannot have numbers with more than 3 digits.
+```
+
+```r
+is.armstrong(x = c(pi, 6))
+```
+
+```
+Error in is.armstrong(x = c(pi, 6)): Cannot have decimal values.
+```
+
+```r
+is.armstrong(x = "a")
+```
+
+```
+Error in is.armstrong(x = "a"): Cannot have non-numeric values.
+```
+
+## Task 3
+
+To determine if a number is an Armstrong number, I first realized that I needed to calculate the number of digits in the number. Because we are working in base 10, multiplying a given number by 10 will increase the amount of digits it has by 1, and so I applied the same logic but in reverse in order to find the number of digits a number has (continue to divide the number by 10, increment digits counter as the amount of digits in the remaining number decreases by 1 each time). Once I calculated the number of digits (stored in the variable called 'digits'), I simply used a loop to extract the last digit of the number (by using %% 10 as the value returned by that operation is the last digit of the current number), applied an exponent with 'digits' as the exponent, and added that result to a variable called 'sum'. I finally checked if 'sum' is the same as the original number; if so, then the original number is an Armstrong number. 
+
+However, I needed to make the code work for inputs of x where x contains more than a single element. I created an initial empty vector ('answer'), and chose to use a for loop to iterate through all of the elements in x. After I determined whether or not the number is an Armstrong number, I added the boolean result (TRUE or FALSE) to the vector, and I ultimately returend this vector as my answer.
+
+In addition to the code that tested whether a number is an Armstrong number, I also needed to include some initial checks in order to improve the robustness of my function. At this point, my code did not handle invalid inputs well or at all. For example, at first, my function could only work on integer values, and I wanted to be able to handle inputs of all types. Because of this, I implemented several stop instructions, where I checked for negative, non-numeric, and decimal values, as well as for values with more than three digits. In addition, at the very beginning, I dealt with NA values (either removing them if na.rm is TRUE, or replacing all NA values with a known non-Armstrong number, such as 10, so that their evaluation will not result in an error but will instead result in FALSE).
+
+After implementing these checks, my function is now robust and, given any input, will either calculate the appropriate value or output the appropriate error message. I do not believe that my code has any apparent weaknesses, as it is robust and handles different inputs well in addition to checking if a number is an Armstrong number in a very efficient way. In terms of both memory and runtime efficiency, I believe that this code is optimal (space complexity is O(n), and runtime complexity is also O(n), which are both extremely efficient) and thus does not have any weaknesses.
